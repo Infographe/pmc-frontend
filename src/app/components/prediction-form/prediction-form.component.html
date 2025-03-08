@@ -1,0 +1,78 @@
+<div class="container mt-4 d-flex justify-content-between">
+  <!-- Gauche -->
+  <div class="prediction">
+    <h2 class="text-center">🔮 Prédictions</h2>
+    <div class="card shadow p-4 fade show">
+      <form (ngSubmit)="envoyerDonnees()" class="row g-3">
+        <div class="col-md-4" *ngFor="let feature of displayedColumns.slice(0,5); let i = index">
+          <label class="form-label">{{ feature | titlecase }}</label>
+          <input type="number" class="form-control" [(ngModel)]="formData[feature]" name="{{ feature }}" required>
+        </div>
+
+        <div class="col-12 text-center mt-3">
+          <button type="submit" class="btn btn-primary mt-3" [disabled]="isLoading">
+            <fa-icon *ngIf="!isLoading" [icon]="faSearch"></fa-icon> Prédire
+            <fa-icon *ngIf="isLoading" [icon]="faSpinner" spin></fa-icon> 
+          </button>
+          
+          
+          
+          <button class="btn btn-danger mt-3" (click)="effacerHistorique()">
+            <fa-icon [icon]="faTrash"></fa-icon> Effacer l'historique
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 🔍 Filtres dynamiques -->
+    <div class="row mt-3">
+      <div class="col-md-4 pb-4 d-flex flex-row" *ngFor="let feature of displayedColumns; let i = index">
+        <input type="text" class="form-control" [(ngModel)]="filterFeatures[i]" (input)="applyFilter()" placeholder="Filtrer {{ feature | titlecase }}">
+      </div>
+    </div>
+    
+  </div>
+
+  
+  
+  <!-- Droite -->
+  <div>
+    <!-- 📜 Historique des Prédictions -->
+    <div class="mt-4">
+      <h4>📜 Historique des Prédictions</h4>
+      <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 table table-striped">
+        <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ col | titlecase }} </th>
+          <td mat-cell *matCellDef="let element"> {{ element[col] }} </td>
+        </ng-container>
+      
+        <thead>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        </thead>
+        <tbody>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="fade-in"></tr>
+        </tbody>      
+      </table>
+      
+
+      <!-- Pagination -->
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+    <!-- Graphiques dévolution -->
+    <div class="mt-4">
+      <h4>📊 Évolution des Prédictions</h4>
+      <div class="chart-container">
+        <canvas id="predictionChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Boutons d'export -->
+    <div class="text-center mt-3">
+      <button class="btn btn-success" (click)="exporterCSV()">📥 Exporter en CSV</button>
+      <button class="btn btn-info" (click)="exporterExcel()">📊 Exporter en Excel</button>
+    </div>
+  </div>
+  
+  
+  
+</div>
