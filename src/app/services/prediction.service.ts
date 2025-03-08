@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface PredictionData {
   feature1: number;
@@ -12,9 +13,10 @@ export interface PredictionData {
 
 @Injectable({ providedIn: 'root' })
 export class PredictionService {
-  private apiUrl = 'http://127.0.0.1:8000/predict';  // Assure-toi que ça pointe bien sur le bon endpoint
+  private apiUrl = `${environment.apiUrl}/predict`;
 
   constructor(private http: HttpClient) {}
+
   getPrediction(data: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, data);
   }
