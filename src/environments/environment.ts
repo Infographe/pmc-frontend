@@ -1,5 +1,4 @@
 export const environment = {
-    production: true,
-    apiUrl: 'https://pmc-backend-q5dn.onrender.com'  // ⚠️ Remplace cette URL par celle de ton API Render
-  };
-  
+  production: false,
+  apiUrl: 'http://localhost:8000'  // 🔹 L'URL locale de ton backend
+};
