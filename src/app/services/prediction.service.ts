@@ -13,8 +13,8 @@ export interface PredictionData {
 
 @Injectable({ providedIn: 'root' })
 export class PredictionService {
-  // private apiUrl = `${environment.apiUrl}/predict`;
-  private apiUrl = `http://localhost:8000`;
+  private apiUrl = `${environment.apiUrl}`;
+  // private apiUrl = `http://localhost:8000`;
 
   constructor(private http: HttpClient) {}
 
