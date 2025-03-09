@@ -143,25 +143,52 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
 
 
   updateChart() {
-    const ctx = document.getElementById('predictionChart') as HTMLCanvasElement;
-    if (!ctx) return;
-    const existingChart = Chart.getChart(ctx);
-    if (existingChart) existingChart.destroy();
+  const ctx1 = document.getElementById('predictionChart') as HTMLCanvasElement;
+  const ctx2 = document.getElementById('predictionHistogram') as HTMLCanvasElement;
+  
+  if (!ctx1 || !ctx2) return;
 
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: this.historiquePredictions.map((_, i) => `Prédiction ${i + 1}`),
-        datasets: [{
-          label: 'Évolution des Prédictions',
-          data: this.historiquePredictions.map(pred => pred['prediction']),
-          borderColor: this.themeSombre ? 'rgba(255, 193, 7, 1)' : 'rgba(0, 123, 255, 1)',
-          borderWidth: 2
-        }]
-      },
-      options: { responsive: true }
-    });
-  }
+  // Supprime les anciens graphiques s'ils existent
+  [ctx1, ctx2].forEach(ctx => {
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) {
+      existingChart.destroy();
+    }
+  });
+
+  const labels = this.historiquePredictions.map((_, index) => `Prédiction ${index + 1}`);
+  const dataValues = this.historiquePredictions.map(pred => pred['prediction']);
+
+  // 📊 Évolution des prédictions
+  new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Évolution des Prédictions',
+        data: dataValues,
+        borderColor: 'rgba(0, 123, 255, 1)',
+        borderWidth: 2
+      }]
+    },
+    options: { responsive: true }
+  });
+
+  // 📈 Histogramme des prédictions
+  new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Distribution des Prédictions',
+        data: dataValues,
+        backgroundColor: 'rgba(255, 99, 132, 0.6)'
+      }]
+    },
+    options: { responsive: true }
+  });
+}
+
 
   applyFilter() {
     this.dataSource.data = this.historiquePredictions.filter(entry =>
@@ -172,16 +199,26 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
   }
 
   exporterCSV() {
+    const header = Object.keys(this.historiquePredictions[0]).join(",");
+    const rows = this.historiquePredictions.map(row => Object.values(row).join(","));
+    const csvContent = "data:text/csv;charset=utf-8," + [header, ...rows].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "historique_predictions.csv");
+    document.body.appendChild(link);
+    link.click();
+  }
+
+
+  exporterExcel() {
     const worksheet = XLSX.utils.json_to_sheet(this.historiquePredictions);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Prédictions");
     const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const data = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(data, "historique_predictions.xlsx");
-  }
-
-  exporterExcel() {
-    this.exporterCSV();
   }
 
   effacerHistorique() {

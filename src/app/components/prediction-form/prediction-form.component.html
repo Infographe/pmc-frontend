@@ -8,10 +8,6 @@
       <mat-slide-toggle [(ngModel)]="filtersEnabled">🎯 Activer les Filtres</mat-slide-toggle>
     </div>
 
-    <!-- <div *ngIf="dataSource.data.length === 0" class="text-center text-muted">
-      ⏳ Aucune prédiction pour le moment. Faites une première prédiction !
-    </div> -->
-
     <div class="card shadow p-4 fade show">
       <!-- Onglets pour organiser les features ou les filtres -->
       <mat-tab-group>
@@ -33,7 +29,7 @@
                 class="form-control" 
                 [(ngModel)]="filterFeatures[feature]" 
                 (input)="applyFilter()" 
-                placeholder="Filtrer {{ feature | titlecase }}"
+                placeholder="🔍 Filtrer {{ feature | titlecase }}"
               >
             </div>
           </div>
@@ -56,7 +52,7 @@
                 class="form-control" 
                 [(ngModel)]="filterFeatures[feature]" 
                 (input)="applyFilter()" 
-                placeholder="Filtrer {{ feature | titlecase }}"
+                placeholder="🔍 Filtrer {{ feature | titlecase }}"
               >
             </div>
           </div>
@@ -79,7 +75,7 @@
                 class="form-control" 
                 [(ngModel)]="filterFeatures[feature]" 
                 (input)="applyFilter()" 
-                placeholder="Filtrer {{ feature | titlecase }}"
+                placeholder="🔍 Filtrer {{ feature | titlecase }}"
               >
             </div>
           </div>
@@ -102,10 +98,10 @@
     </div>
   </div>
 
-  <!-- 📜 Historique des Prédictions en pleine largeur -->
+  <!-- 📜 Historique des Prédictions avec scroll horizontal -->
   <div class="mt-4">
     <h4>📜 Historique des Prédictions</h4>
-    <div class="table-responsive">
+    <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
       <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 table table-striped w-100">
         <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ col | titlecase }} </th>
@@ -124,14 +120,23 @@
     <!-- Pagination -->
     <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
   </div>
+  <div class="d-flex">
+    <!-- 📊 Graphiques -->
+    <div class="mt-4 col-6">
+      <h4>📊 Évolution des Prédictions</h4>
+      <div class="chart-container">
+        <canvas id="predictionChart"></canvas>
+      </div>
+    </div>
 
-  <!-- Graphiques d'évolution -->
-  <div class="mt-4">
-    <h4>📊 Évolution des Prédictions</h4>
-    <div class="chart-container">
-      <canvas id="predictionChart"></canvas>
+    <div class="mt-4 col-6">
+      <h4>📈 Distribution des Prédictions</h4>
+      <div class="chart-container">
+        <canvas id="predictionHistogram"></canvas>
+      </div>
     </div>
   </div>
+  
 
   <!-- Boutons d'export -->
   <div class="text-center mt-3">
