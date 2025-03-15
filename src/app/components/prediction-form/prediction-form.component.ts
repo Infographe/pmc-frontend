@@ -20,6 +20,7 @@ import { faSearch, faTrash, faSpinner, faDownload, faSun, faMoon } from '@fortaw
 import { Chart, registerables } from 'chart.js';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { faChevronDown, faChevronUp} from '@fortawesome/free-solid-svg-icons';
 
 Chart.register(...registerables);
 
@@ -62,12 +63,17 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
   faSearch = faSearch;
   faTrash = faTrash;
   faSpinner = faSpinner;
+  faChevronDown = faChevronDown;
+  faChevronUp = faChevronUp;
+
   faDownload = faDownload;
   faSun = faSun;
   faMoon = faMoon;
   formData: PredictionData = {};
   filterFeatures: { [key: string]: string } = {};
-
+  inputsVisible: boolean = true;
+  selectedTab: number = 0;
+  
   // Catégorisation des features
   featuresMain = this.allFeatures.slice(0, 10);
   featuresSecondary = this.allFeatures.slice(10, 20);
@@ -86,7 +92,9 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     this.allFeatures.forEach(feature => this.filterFeatures[feature] = '');
+    new MatTableDataSource<PredictionData>(this.historiquePredictions);
 
+    
     console.log("🚀 Initialisation du composant");
     this.dataSource.data = this.historiquePredictions;
     console.log("🔍 Contenu du tableau au démarrage :", this.dataSource.data);
@@ -99,9 +107,14 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
 }
 
   
+  toggleInputs() {
+    this.inputsVisible = !this.inputsVisible;
+    setTimeout(() => this.cdr.detectChanges(), 0);
+  }
+
   toggleFilters() {
     this.filtersEnabled = !this.filtersEnabled;
-    this.applyFilter();
+    setTimeout(() => this.cdr.detectChanges(), 0);
   }
 
   toggleTheme() {

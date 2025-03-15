@@ -1,146 +1,125 @@
 <div class="container mt-4">
   <!-- Prédictions et Filtres -->
   <div class="prediction">
-    <h2 class="text-center">🔮 Prédictions</h2>
+    <h2 class="text-center">Comment puis-je vous aider ?</h2>
 
-    <!-- Activation des Filtres -->
-    <div class="d-flex justify-content-end align-items-center mb-3">
-      <mat-slide-toggle [(ngModel)]="filtersEnabled">🎯 Activer les Filtres</mat-slide-toggle>
+    <!-- Boutons d'options -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <button class="btn btn-outline-info" (click)="toggleFilters()">
+        <fa-icon [icon]="filtersEnabled ? faChevronUp : faChevronDown"></fa-icon> &nbsp;
+        {{ filtersEnabled ? 'Désactiver les Filtres' : 'Activer les Filtres' }}
+      </button>
+      <button class="btn btn-outline-primary" type="button" (click)="toggleInputs()">
+        <fa-icon [icon]="inputsVisible ? faChevronUp : faChevronDown"></fa-icon> &nbsp;
+        {{ inputsVisible ? 'Réduire les champs' : 'Dérouler les champs' }}
+      </button>
     </div>
 
     <div class="card shadow p-4 fade show">
-      <!-- Onglets pour organiser les features ou les filtres -->
+      <!-- Onglets pour organiser les features -->
       <mat-tab-group>
         <mat-tab label="Données Principales">
-          <div class="row g-3">
-            <div class="col-md-4" *ngFor="let feature of featuresMain">
-              <label class="form-label">{{ feature | titlecase }}</label>
-              <input 
-                *ngIf="!filtersEnabled" 
-                type="number" 
-                class="form-control" 
-                [(ngModel)]="formData[feature]" 
-                name="{{ feature }}" 
-                required
-              >
-              <input 
-                *ngIf="filtersEnabled" 
-                type="text" 
-                class="form-control" 
-                [(ngModel)]="filterFeatures[feature]" 
-                (input)="applyFilter()" 
-                placeholder="🔍 Filtrer {{ feature | titlecase }}"
-              >
+          <div class="collapse" [class.show]="inputsVisible">
+            <div class="row g-3">
+              <div class="col-md-4" *ngFor="let feature of featuresMain">
+                <label class="form-label white ">{{ feature | titlecase }}</label>
+                <input *ngIf="!filtersEnabled" type="number" class="form-control" [(ngModel)]="formData[feature]" name="{{ feature }}" required>
+                <input *ngIf="filtersEnabled" type="text" class="form-control" [(ngModel)]="filterFeatures[feature]" (input)="applyFilter()" placeholder="🔍 Filtrer {{ feature | titlecase }}">
+              </div>
             </div>
           </div>
         </mat-tab>
 
         <mat-tab label="Données Complémentaires">
-          <div class="row g-3">
-            <div class="col-md-4" *ngFor="let feature of featuresSecondary">
-              <label class="form-label">{{ feature | titlecase }}</label>
-              <input 
-                *ngIf="!filtersEnabled" 
-                type="number" 
-                class="form-control" 
-                [(ngModel)]="formData[feature]" 
-                name="{{ feature }}"
-              >
-              <input 
-                *ngIf="filtersEnabled" 
-                type="text" 
-                class="form-control" 
-                [(ngModel)]="filterFeatures[feature]" 
-                (input)="applyFilter()" 
-                placeholder="🔍 Filtrer {{ feature | titlecase }}"
-              >
+          <div class="collapse" [class.show]="inputsVisible">
+            <div class="row g-3">
+              <div class="col-md-4" *ngFor="let feature of featuresSecondary">
+                <label class="form-label white">{{ feature | titlecase }}</label>
+                <input *ngIf="!filtersEnabled" type="number" class="form-control" [(ngModel)]="formData[feature]" name="{{ feature }}">
+                <input *ngIf="filtersEnabled" type="text" class="form-control" [(ngModel)]="filterFeatures[feature]" (input)="applyFilter()" placeholder="🔍 Filtrer {{ feature | titlecase }}">
+              </div>
             </div>
           </div>
         </mat-tab>
 
         <mat-tab label="Autres">
-          <div class="row g-3">
-            <div class="col-md-4" *ngFor="let feature of featuresOthers">
-              <label class="form-label">{{ feature | titlecase }}</label>
-              <input 
-                *ngIf="!filtersEnabled" 
-                type="number" 
-                class="form-control" 
-                [(ngModel)]="formData[feature]" 
-                name="{{ feature }}"
-              >
-              <input 
-                *ngIf="filtersEnabled" 
-                type="text" 
-                class="form-control" 
-                [(ngModel)]="filterFeatures[feature]" 
-                (input)="applyFilter()" 
-                placeholder="🔍 Filtrer {{ feature | titlecase }}"
-              >
+          <div class="collapse" [class.show]="inputsVisible">
+            <div class="row g-3">
+              <div class="col-md-4" *ngFor="let feature of featuresOthers">
+                <label class="form-label white">{{ feature | titlecase }}</label>
+                <input *ngIf="!filtersEnabled" type="number" class="form-control" [(ngModel)]="formData[feature]" name="{{ feature }}">
+                <input *ngIf="filtersEnabled" type="text" class="form-control" [(ngModel)]="filterFeatures[feature]" (input)="applyFilter()" placeholder="🔍 Filtrer {{ feature | titlecase }}">
+              </div>
             </div>
           </div>
         </mat-tab>
       </mat-tab-group>
 
-      <div class="col-12 text-center mt-3" *ngIf="!filtersEnabled">
-        <button type="button" class="btn btn-primary mt-3" (click)="envoyerDonnees()" [disabled]="isLoading">
-          <fa-icon *ngIf="!isLoading" [icon]="faSearch"></fa-icon> Prédire
+      <!-- Boutons d'action -->
+      <div class="col-12 text-center mt-3">
+        <button *ngIf="!filtersEnabled" class="btn mt-3" (click)="envoyerDonnees()" [disabled]="isLoading">
+          Prédire
           <fa-icon *ngIf="isLoading" [icon]="faSpinner" spin></fa-icon> 
         </button>
-        
-        <button class="btn btn-danger mt-3" (click)="effacerHistorique()">
-          <fa-icon [icon]="faTrash"></fa-icon> Effacer l'historique
+
+        <button class="btn mt-3" (click)="effacerHistorique()">
+          <!-- <fa-icon [icon]="faTrash"></fa-icon> Effacer l'historique -->
+          Effacer l'historique
         </button>
 
-        <!-- Bouton Auto-remplissage -->
-        <button class="btn btn-warning mt-3" (click)="autoFill()">📝 Auto Remplissage</button>
+        <button class="btn mt-3" (click)="autoFill()">Auto Remplissage</button>
       </div>
     </div>
   </div>
 
   <!-- 📜 Historique des Prédictions avec scroll horizontal -->
-  <div class="mt-4">
-    <h4>📜 Historique des Prédictions</h4>
-    <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
-      <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 table table-striped w-100">
-        <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ col | titlecase }} </th>
-          <td mat-cell *matCellDef="let element"> {{ element[col] }} </td>
-        </ng-container>
+  <div>
+    <hr class="mt-5 mb-5" data-start="6945" data-end="6948">
+    <div class="mt-4">
+      <h4>Historique des Prédictions</h4>
+      <!-- <h4>📜 Historique des Prédictions</h4> -->
+      <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 table table-striped w-100">
+          <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ col | titlecase }} </th>
+            <td mat-cell *matCellDef="let element"> {{ element[col] }} </td>
+          </ng-container>
 
-        <thead>
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        </thead>
-        <tbody>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="fade-in"></tr>
-        </tbody>      
-      </table>
+          <thead>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          </thead>
+          <tbody>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="fade-in"></tr>
+          </tbody>      
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
 
-    <!-- Pagination -->
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
-  </div>
-  <div class="d-flex">
-    <!-- 📊 Graphiques -->
-    <div class="mt-4 col-6">
-      <h4>📊 Évolution des Prédictions</h4>
-      <div class="chart-container">
-        <canvas id="predictionChart"></canvas>
+    <hr class="mt-5 mb-5" data-start="6945" data-end="6948">
+    <!-- 📊 Graphiques d'analyse -->
+    <div class="d-flex">
+      <div class="mt-4 col-6">
+        <h4>📊 Évolution des Prédictions</h4>
+        <div class="chart-container">
+          <canvas id="predictionChart"></canvas>
+        </div>
+      </div>
+
+      <div class="mt-4 col-6">
+        <h4>📈 Distribution des Prédictions</h4>
+        <div class="chart-container">
+          <canvas id="predictionHistogram"></canvas>
+        </div>
       </div>
     </div>
 
-    <div class="mt-4 col-6">
-      <h4>📈 Distribution des Prédictions</h4>
-      <div class="chart-container">
-        <canvas id="predictionHistogram"></canvas>
-      </div>
+    <!-- Boutons d'export -->
+    <div class="text-center mt-3">
+      <button class="btn btn-success" (click)="exporterCSV()">📥 Exporter en CSV</button>
+      <button class="btn btn-info" (click)="exporterExcel()">📊 Exporter en Excel</button>
     </div>
-  </div>
-  
-
-  <!-- Boutons d'export -->
-  <div class="text-center mt-3">
-    <button class="btn btn-success" (click)="exporterCSV()">📥 Exporter en CSV</button>
-    <button class="btn btn-info" (click)="exporterExcel()">📊 Exporter en Excel</button>
   </div>
 </div>

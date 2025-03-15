@@ -2,23 +2,41 @@
 .container {
   /* max-width: 900px; */
   margin: auto;
-  padding: 20px;
+  /* padding: 25vh 20vh; */
+  width: 50vw;
+}
+/* rectif */
+.white{
+  color: white;
+}
+
+.container.mt-4 {
+  margin-top: 30vh !important;
 }
 
 /* 🌟 Style des cartes */
 .card {
-  border-radius: 10px;
+  border-radius: 1.5rem;
   padding: 20px;
-  background: var(--bg-color);
+  background-color: #353535;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease-in-out;
 }
 
+.prediction{
+  width: 50vw;
+  margin: auto;
+}
+
+.bottom {
+  position: relative;
+  top: 400px;
+}
 /* 🌟 Champs de saisie */
 input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
+  /* border: 1px solid #ccc; */
   border-radius: 5px;
   font-size: 16px;
   transition: border-color 0.3s ease-in-out;
@@ -30,16 +48,13 @@ input:focus {
   box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
 }
 
-/* Prédiction */
-.prediction {
-  margin-right: 50px;
-}
 
 /* 🌟 Boutons */
 button {
   width: auto;
   padding: 10px 15px;
   border-radius: 5px;
+  color: rgb(143, 143, 143);
   border: none;
   font-size: 16px;
   cursor: pointer;
@@ -51,10 +66,23 @@ button {
 
 button:hover {
   transform: scale(1.05);
+  background-color: transparent;
 }
 
-.btn-primary {
-  /* background-color: var(--primary-color); */
+button.btn.mt-3 {
+  border: solid 1px rgb(143, 143, 143);
+  border-radius: 25px;
+  margin: 0 45px;
+}
+
+span.mdc-tab__text-label, .mat-mdc-select-trigger  {
+  color: rgb(143, 143, 143) ;
+}
+
+
+.btn-primary, span, .form-control {
+  border: none;
+  background-color: #505050;
   color: white;
 }
 
@@ -69,7 +97,7 @@ button:hover {
 }
 
 .btn-info {
-  background-color: #17a2b8;
+  background-color: #3a4142;
   color: white;
 }
 
@@ -155,55 +183,3 @@ mat-paginator {
 .fade-in {
   animation: fadeIn 0.5s forwards;
 }
-
-/* 🌟 Mode sombre */
-:root {
-  --primary-color: #007bff;
-  --bg-color: white;
-  --text-color: black;
-}
-
-.dark-mode {
-  --primary-color: #ffcc00;
-  --bg-color: #121212;
-  --text-color: white;
-}
-
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  transition: background-color 0.3s, color 0.3s;
-}
-
-/* 🌟 Snackbar */
-.error-snackbar {
-  background: #ff4c4c;
-  color: white;
-}
-
-.success-snackbar {
-  background: #4caf50;
-  color: white;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-in {
-  animation: fadeIn 0.5s forwards;
-}
-
-.chart-container {
-  width: 100%;
-  height: 300px;
-  margin-top: 20px;
-}
-
