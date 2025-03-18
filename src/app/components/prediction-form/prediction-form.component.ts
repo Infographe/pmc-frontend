@@ -204,7 +204,9 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
       // Met à jour l'affichage dans formData
       this.formData[feature.name] = randomValue;
     });
-  
+    
+    console.log("🎲 Autofill généré :", this.formGroup.value);
+
     this.cdr.detectChanges();
   }
   
@@ -215,7 +217,7 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const featuresArray = this.allFeatures.map(f => this.formGroup.value[f.name]);
+    const featuresArray = this.allFeatures.map(f => this.formGroup.controls[f.name].value);
     const inputData = {
       model_type: this.selectedModel?.trim().toLowerCase(), // Normalisation
       features: featuresArray
@@ -238,6 +240,8 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
         this.updateChart();
         console.log('📡 Données envoyées à l’API:', JSON.stringify(inputData));
+        console.log("🔍 Vérification avant envoi :", this.formGroup.value);
+        console.log("📡 Features envoyées :", featuresArray.length, featuresArray);
 
       },
       error: (error) => {
@@ -245,6 +249,8 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
       }
     });
+    
+
   }
 
   
