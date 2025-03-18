@@ -13,13 +13,11 @@ export interface PredictionData {
 
 @Injectable({ providedIn: 'root' })
 export class PredictionService {
-  // private apiUrl = `${environment.apiUrl}`;
-  private apiUrl = `http://localhost:8000`;
+  private apiUrl = `${environment.apiUrl}`;
+  // private apiUrl = `http://localhost:8000`;
 
   constructor(private http: HttpClient) {}
 
-  
-  
 
   getPrediction(data: any, modelType: string): Observable<any> {
     const payload = { ...data, model_type: modelType }; // Ajoute model_type au payload
@@ -30,7 +28,6 @@ export class PredictionService {
         catchError(this.handleError)
     );
 }
-
 
 
   // ✅ Ajout de la gestion des erreurs
