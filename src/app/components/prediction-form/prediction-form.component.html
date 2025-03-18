@@ -22,10 +22,13 @@
           <div class="collapse" [class.show]="inputsVisible">
             <div class="row g-3">
               <div class="col-md-4" *ngFor="let feature of featuresMain">
-                <label class="form-label white ">{{ feature | titlecase }}</label>
-                <input *ngIf="!filtersEnabled" type="number" class="form-control" [(ngModel)]="formData[feature]" name="{{ feature }}" required>
-                <input *ngIf="filtersEnabled" type="text" class="form-control" [(ngModel)]="filterFeatures[feature]" (input)="applyFilter()" placeholder="🔍 Filtrer {{ feature | titlecase }}">
+                <label class="form-label white">{{ feature.name | titlecase }}</label>
+                <input type="number" class="form-control" 
+                       [formControlName]="feature.name" 
+                       [attr.name]="feature.name"
+                       required>
               </div>
+              
             </div>
           </div>
         </mat-tab>
@@ -34,9 +37,8 @@
           <div class="collapse" [class.show]="inputsVisible">
             <div class="row g-3">
               <div class="col-md-4" *ngFor="let feature of featuresSecondary">
-                <label class="form-label white">{{ feature | titlecase }}</label>
-                <input *ngIf="!filtersEnabled" type="number" class="form-control" [(ngModel)]="formData[feature]" name="{{ feature }}">
-                <input *ngIf="filtersEnabled" type="text" class="form-control" [(ngModel)]="filterFeatures[feature]" (input)="applyFilter()" placeholder="🔍 Filtrer {{ feature | titlecase }}">
+                <label class="form-label white ">{{ feature.name | titlecase }}</label>
+                <input type="number" class="form-control" [formControlName]="feature.name" required>
               </div>
             </div>
           </div>
@@ -46,9 +48,8 @@
           <div class="collapse" [class.show]="inputsVisible">
             <div class="row g-3">
               <div class="col-md-4" *ngFor="let feature of featuresOthers">
-                <label class="form-label white">{{ feature | titlecase }}</label>
-                <input *ngIf="!filtersEnabled" type="number" class="form-control" [(ngModel)]="formData[feature]" name="{{ feature }}">
-                <input *ngIf="filtersEnabled" type="text" class="form-control" [(ngModel)]="filterFeatures[feature]" (input)="applyFilter()" placeholder="🔍 Filtrer {{ feature | titlecase }}">
+                <label class="form-label white ">{{ feature.name | titlecase }}</label>
+                <input type="number" class="form-control" [formControlName]="feature.name" required>
               </div>
             </div>
           </div>
@@ -76,30 +77,41 @@
   <div>
     <hr class="mt-5 mb-5" data-start="6945" data-end="6948">
     <div class="mt-4">
-      <h4>Historique des Prédictions</h4>
-      <!-- <h4>📜 Historique des Prédictions</h4> -->
-      <div class="table-responsive" style="overflow-x: auto; max-width: 100%;">
-        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 table table-striped w-100">
-          <ng-container *ngFor="let col of displayedColumns" [matColumnDef]="col">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ col | titlecase }} </th>
-            <td mat-cell *matCellDef="let element"> {{ element[col] }} </td>
+      <h4>📜 Historique des Prédictions</h4>
+      <div class="table-responsive">
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 table table-striped">
+          
+          <!-- Colonnes dynamiques pour chaque feature -->
+          <ng-container *ngFor="let col of allFeatures" [matColumnDef]="col.name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ col.name | titlecase }} </th>
+            <td mat-cell *matCellDef="let element"> {{ element[col.name] }} </td>
           </ng-container>
-
+          
+    
+          <!-- Colonne spéciale pour la prédiction -->
+          <ng-container matColumnDef="prediction">
+            <th mat-header-cell *matHeaderCellDef> Prédiction </th>
+            <td mat-cell *matCellDef="let element" class="prediction-column"> 
+              <span class="badge bg-success">{{ element.prediction | number:'1.2-2' }}</span>
+            </td>
+          </ng-container>
+    
           <thead>
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           </thead>
           <tbody>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="fade-in"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
           </tbody>      
         </table>
       </div>
-
+    
       <!-- Pagination -->
       <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
+    
 
     <hr class="mt-5 mb-5" data-start="6945" data-end="6948">
-    <!-- 📊 Graphiques d'analyse -->
+    <!-- 📊 Évolution des Prédictions -->
     <div class="d-flex">
       <div class="mt-4 col-6">
         <h4>📊 Évolution des Prédictions</h4>
@@ -108,6 +120,7 @@
         </div>
       </div>
 
+      <!-- 📈 Histogramme des Prédictions -->
       <div class="mt-4 col-6">
         <h4>📈 Distribution des Prédictions</h4>
         <div class="chart-container">
@@ -116,10 +129,25 @@
       </div>
     </div>
 
+
     <!-- Boutons d'export -->
-    <div class="text-center mt-3 exports">
+    <div class="d-flex flex-column ml-5 mt-3 exports">
+      
+        <select class="form-select " [(ngModel)]="selectedModel">
+          <option value="ml">Machine Learning <fa-icon class="ml" [icon]="faChevronDown"></fa-icon></option>
+          <option value="dl">Deep Learning <fa-icon class="ml" [icon]="faChevronDown"></fa-icon></option>
+        </select>
+      
+      
       <button class="btn btn-success" (click)="exporterCSV()">Exporter en CSV</button>
       <button class="btn btn-info" (click)="exporterExcel()">Exporter en Excel</button>
     </div>
   </div>
+  <div *ngIf="prediction !== null">
+    <h3>📊 Résultat de la prédiction :</h3>
+    <p>{{ prediction }}</p>
+  </div>
+  
 </div>
+
+

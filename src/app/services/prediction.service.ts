@@ -13,18 +13,24 @@ export interface PredictionData {
 
 @Injectable({ providedIn: 'root' })
 export class PredictionService {
-  private apiUrl = `${environment.apiUrl}`;
-  // private apiUrl = `http://localhost:8000`;
+  // private apiUrl = `${environment.apiUrl}`;
+  private apiUrl = `http://localhost:8000`;
 
   constructor(private http: HttpClient) {}
 
-  getPrediction(data: any): Observable<any> {
-    console.log("📡 Envoi des données à l'API :", data); // Ajout Debug
-    return this.http.post<any>(`${this.apiUrl}/predict`, data).pipe(
-        tap(response => console.log("📥 Réponse de l'API :", response)), // Ajout Debug
+  
+  
+
+  getPrediction(data: any, modelType: string): Observable<any> {
+    const payload = { ...data, model_type: modelType }; // Ajoute model_type au payload
+    console.log("📡 Envoi des données à l'API :", payload); // Debug
+
+    return this.http.post<any>(`${this.apiUrl}/predict`, payload).pipe(
+        tap(response => console.log("📥 Réponse de l'API :", response)), // Debug
         catchError(this.handleError)
     );
 }
+
 
 
   // ✅ Ajout de la gestion des erreurs

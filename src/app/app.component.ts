@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';  // ✅ À conserver
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatInputModule } from '@angular/material/input';
@@ -17,6 +17,7 @@ import { PredictionFormComponent } from './components/prediction-form/prediction
   imports: [
     CommonModule,  // ✅ Remplace `BrowserModule`
     FormsModule,
+    ReactiveFormsModule,
     HttpClientModule,
     MatSliderModule,
     MatInputModule,
@@ -31,13 +32,30 @@ import { PredictionFormComponent } from './components/prediction-form/prediction
 })
 export class AppComponent {
   prediction: any;
+  selectedModelType: string = "ml";  // ✅ Par défaut, modèle ML sélectionné
 
   constructor(private predictionService: PredictionService) {}
 
   envoyerDonnees() {
-    const inputData: PredictionData = { feature1: 1.5, feature2: 3.2, feature3: 2.1, feature4: 4.5, feature5: 0.9 };  // ✅ Toutes les features
-    this.predictionService.getPrediction(inputData).subscribe(response => {
-      this.prediction = response;
+    const inputData: PredictionData = { 
+      feature1: 1.5, 
+      feature2: 3.2, 
+      feature3: 2.1, 
+      feature4: 4.5, 
+      feature5: 0.9 
+    };
+
+    console.log("📡 Envoi des données avec modèle :", this.selectedModelType);
+    console.log("🔍 Features envoyées :", inputData);
+
+    this.predictionService.getPrediction(inputData, this.selectedModelType).subscribe({
+      next: (response) => {
+        console.log("✅ Réponse reçue :", response);
+        this.prediction = response;
+      },
+      error: (error) => {
+        console.error("❌ Erreur API :", error);
+      }
     });
   }
 }
