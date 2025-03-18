@@ -29,6 +29,40 @@ export interface PredictionData {
   [key: string]: any;
 }
 
+export interface Features {
+  Cyclepds: number;
+  region: number;
+  dept: number;
+  annee: number;
+  mois: number;
+  pm10: number;
+  carbon_monoxide: number;
+  poids_moyen: number;
+  regime_special: number;
+  p_animal: number;
+  agglo9: number;
+  entrerep: number;
+  fastfood: number;
+  ozone: number;
+  dip: number;
+  sulphur_dioxide: number;
+  temps_act_phy: number;
+  sedentaire: number;
+  sexeps: number;
+  vistes_medecins: number;
+  pm2_5: number;
+  taille: number;
+  IMC: number;
+  situ_prof: number;
+  grass_pollen: number;
+  enrich: number;
+  heur_trav: number;
+  situ_mat: number;
+  nitrogen_dioxide: number;
+  fqvpo: number;
+}
+
+
 @Component({
   selector: 'app-prediction-form',
   templateUrl: './prediction-form.component.html',
@@ -216,42 +250,45 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
       this.showNotification('❌ Veuillez remplir tous les champs correctement.', true);
       return;
     }
-
-    const featuresArray = this.allFeatures.map(f => this.formGroup.controls[f.name].value);
+  
+    // ✅ Génération de l'objet features correctement formaté
+    const featuresObject: { [key: string]: number } = Object.keys(this.formGroup.controls).reduce((acc, key) => {
+      acc[key] = this.formGroup.controls[key].value;
+      return acc;
+    }, {} as { [key: string]: number });
+    
     const inputData = {
-      model_type: this.selectedModel?.trim().toLowerCase(), // Normalisation
-      features: featuresArray
+      model_type: this.selectedModelType?.trim().toLowerCase(),  // ✅ Assure que la valeur est bien une chaîne correcte
+      features: Object.keys(this.formGroup.value).reduce((acc, key) => {
+          acc[key] = Number(this.formGroup.value[key]);  // ✅ Conversion en nombre
+          return acc;
+      }, {} as { [key: string]: number })
     };
+  
     
-    if (inputData.model_type !== 'ml' && inputData.model_type !== 'dl') {
-      console.error("❌ Modèle incorrect :", inputData.model_type);
-      this.showNotification("⚠️ Modèle inconnu. Choisissez 'ml' ou 'dl'.", true);
-      return;
-    }
+  
+    console.log("📡 Données envoyées :", inputData); // Debugging avant envoi
     
+
     
     this.isLoading = true;
-    this.predictionService.getPrediction(inputData, this.selectedModel).subscribe({
+    this.predictionService.getPrediction(inputData).subscribe({
       next: (response) => {
-        const newPrediction = { ...this.formGroup.value, prediction: response.prediction };
+        const newPrediction = { ...featuresObject, prediction: response.prediction };
         this.historiquePredictions.unshift(newPrediction);
         this.dataSource.data = [...this.historiquePredictions];
         this.isLoading = false;
         this.cdr.detectChanges();
         this.updateChart();
-        console.log('📡 Données envoyées à l’API:', JSON.stringify(inputData));
-        console.log("🔍 Vérification avant envoi :", this.formGroup.value);
-        console.log("📡 Features envoyées :", featuresArray.length, featuresArray);
-
       },
       error: (error) => {
         console.error('❌ Erreur API :', error);
         this.isLoading = false;
       }
     });
-    
-
   }
+  
+  
 
   
 
