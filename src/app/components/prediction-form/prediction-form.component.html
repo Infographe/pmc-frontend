@@ -16,86 +16,94 @@
     </div>
 
     <div class="card shadow p-4 fade show">
-      <!-- Onglets pour organiser les features -->
-      <mat-tab-group>
-        <mat-tab label="Données Principales">
-          <div class="collapse" [class.show]="inputsVisible">
-            <div class="row g-3">
-              <div class="col-md-4" *ngFor="let feature of featuresMain">
-                <label class="form-label white">{{ feature.name | titlecase }}</label>
-                <input type="number" class="form-control" 
-                       [formControlName]="feature.name" 
-                       [attr.name]="feature.name"
-                       required>
+      <!-- 📝 Formulaire lié à formGroup -->
+      <form [formGroup]="formGroup">
+        <mat-tab-group>
+          <mat-tab label="Données Principales">
+            <div class="collapse" [class.show]="inputsVisible">
+              <div class="row g-3">
+                <div class="col-md-4" *ngFor="let feature of featuresMain">
+                  <label class="form-label">{{ feature.name | titlecase }}</label>
+                  <input type="number" class="form-control"
+                         [formControlName]="feature.name"
+                         [attr.name]="feature.name"
+                         [ngClass]="{'is-invalid': formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched}">
+                  <div *ngIf="formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched" class="text-danger">
+                    Valeur invalide (Min: {{feature.min}}, Max: {{feature.max}})
+                  </div>
+                </div>
               </div>
-              
             </div>
-          </div>
-        </mat-tab>
+          </mat-tab>
 
-        <mat-tab label="Données Complémentaires">
-          <div class="collapse" [class.show]="inputsVisible">
-            <div class="row g-3">
-              <div class="col-md-4" *ngFor="let feature of featuresSecondary">
-                <label class="form-label white ">{{ feature.name | titlecase }}</label>
-                <input type="number" class="form-control" [formControlName]="feature.name" required>
+          <mat-tab label="Données Complémentaires">
+            <div class="collapse" [class.show]="inputsVisible">
+              <div class="row g-3">
+                <div class="col-md-4" *ngFor="let feature of featuresSecondary">
+                  <label class="form-label">{{ feature.name | titlecase }}</label>
+                  <input type="number" class="form-control"
+                         [formControlName]="feature.name"
+                         [attr.name]="feature.name"
+                         [ngClass]="{'is-invalid': formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched}">
+                  <div *ngIf="formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched" class="text-danger">
+                    Valeur invalide (Min: {{feature.min}}, Max: {{feature.max}})
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </mat-tab>
+          </mat-tab>
 
-        <mat-tab label="Autres">
-          <div class="collapse" [class.show]="inputsVisible">
-            <div class="row g-3">
-              <div class="col-md-4" *ngFor="let feature of featuresOthers">
-                <label class="form-label white ">{{ feature.name | titlecase }}</label>
-                <input type="number" class="form-control" [formControlName]="feature.name" required>
+          <mat-tab label="Autres">
+            <div class="collapse" [class.show]="inputsVisible">
+              <div class="row g-3">
+                <div class="col-md-4" *ngFor="let feature of featuresOthers">
+                  <label class="form-label">{{ feature.name | titlecase }}</label>
+                  <input type="number" class="form-control"
+                         [formControlName]="feature.name"
+                         [attr.name]="feature.name"
+                         [ngClass]="{'is-invalid': formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched}">
+                  <div *ngIf="formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched" class="text-danger">
+                    Valeur invalide (Min: {{feature.min}}, Max: {{feature.max}})
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
+          </mat-tab>
+        </mat-tab-group>
+      </form>
 
       <!-- Boutons d'action -->
       <div class="col-12 text-center mt-3">
-        <button *ngIf="!filtersEnabled" class="btn mt-3" (click)="envoyerDonnees()" [disabled]="isLoading">
+        <button *ngIf="!filtersEnabled" class="btn mt-3" (click)="envoyerDonnees()" [disabled]="isLoading || formGroup.invalid">
           Prédire
           <fa-icon *ngIf="isLoading" [icon]="faSpinner" spin></fa-icon> 
         </button>
 
-        <button class="btn mt-3" (click)="effacerHistorique()">
-          <!-- <fa-icon [icon]="faTrash"></fa-icon> Effacer l'historique -->
-          Effacer l'historique
-        </button>
-
+        <button class="btn mt-3" (click)="effacerHistorique()">Effacer l'historique</button>
         <button class="btn mt-3" (click)="autoFill()">Auto Remplissage</button>
       </div>
     </div>
   </div>
 
-  <!-- 📜 Historique des Prédictions avec scroll horizontal -->
+  <!-- 📜 Historique des Prédictions -->
   <div>
-    <hr class="mt-5 mb-5" data-start="6945" data-end="6948">
+    <hr class="mt-5 mb-5">
     <div class="mt-4">
       <h4>📜 Historique des Prédictions</h4>
       <div class="table-responsive">
         <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 table table-striped">
-          
-          <!-- Colonnes dynamiques pour chaque feature -->
           <ng-container *ngFor="let col of allFeatures" [matColumnDef]="col.name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ col.name | titlecase }} </th>
-            <td mat-cell *matCellDef="let element"> {{ element[col.name] }} </td>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ col.name | titlecase }}</th>
+            <td mat-cell *matCellDef="let element">{{ element[col.name] }}</td>
           </ng-container>
-          
-    
-          <!-- Colonne spéciale pour la prédiction -->
+
           <ng-container matColumnDef="prediction">
             <th mat-header-cell *matHeaderCellDef> Prédiction </th>
             <td mat-cell *matCellDef="let element" class="prediction-column"> 
               <span class="badge bg-success">{{ element.prediction | number:'1.2-2' }}</span>
             </td>
           </ng-container>
-    
+
           <thead>
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           </thead>
@@ -104,14 +112,13 @@
           </tbody>      
         </table>
       </div>
-    
+
       <!-- Pagination -->
       <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
-    
 
-    <hr class="mt-5 mb-5" data-start="6945" data-end="6948">
-    <!-- 📊 Évolution des Prédictions -->
+    <hr class="mt-5 mb-5">
+    <!-- 📊 Graphiques -->
     <div class="d-flex">
       <div class="mt-4 col-6">
         <h4>📊 Évolution des Prédictions</h4>
@@ -119,8 +126,6 @@
           <canvas id="predictionChart"></canvas>
         </div>
       </div>
-
-      <!-- 📈 Histogramme des Prédictions -->
       <div class="mt-4 col-6">
         <h4>📈 Distribution des Prédictions</h4>
         <div class="chart-container">
@@ -129,25 +134,20 @@
       </div>
     </div>
 
-
     <!-- Boutons d'export -->
     <div class="d-flex flex-column ml-5 mt-3 exports">
-      
-        <select class="form-select " [(ngModel)]="selectedModel">
-          <option value="ml">Machine Learning <fa-icon class="ml" [icon]="faChevronDown"></fa-icon></option>
-          <option value="dl">Deep Learning <fa-icon class="ml" [icon]="faChevronDown"></fa-icon></option>
-        </select>
-      
-      
+      <select class="form-select" [(ngModel)]="selectedModel">
+        <option value="ml">Machine Learning</option>
+        <option value="dl">Deep Learning</option>
+      </select>
+
       <button class="btn btn-success" (click)="exporterCSV()">Exporter en CSV</button>
       <button class="btn btn-info" (click)="exporterExcel()">Exporter en Excel</button>
     </div>
   </div>
+
   <div *ngIf="prediction !== null">
     <h3>📊 Résultat de la prédiction :</h3>
     <p>{{ prediction }}</p>
   </div>
-  
 </div>
-
-
