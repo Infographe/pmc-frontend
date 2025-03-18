@@ -217,10 +217,17 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
 
     const featuresArray = this.allFeatures.map(f => this.formGroup.value[f.name]);
     const inputData = {
-      model_type: this.selectedModel,
+      model_type: this.selectedModel?.trim().toLowerCase(), // Normalisation
       features: featuresArray
     };
-
+    
+    if (inputData.model_type !== 'ml' && inputData.model_type !== 'dl') {
+      console.error("❌ Modèle incorrect :", inputData.model_type);
+      this.showNotification("⚠️ Modèle inconnu. Choisissez 'ml' ou 'dl'.", true);
+      return;
+    }
+    
+    
     this.isLoading = true;
     this.predictionService.getPrediction(inputData, this.selectedModel).subscribe({
       next: (response) => {
@@ -230,6 +237,8 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
         this.cdr.detectChanges();
         this.updateChart();
+        console.log('📡 Données envoyées à l’API:', JSON.stringify(inputData));
+
       },
       error: (error) => {
         console.error('❌ Erreur API :', error);
