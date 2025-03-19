@@ -53,8 +53,8 @@ export interface PredictionResponse {
 @Injectable({ providedIn: 'root' })
 export class PredictionService {
   // private apiUrl = `${environment.apiUrl}`;
-  private apiUrl = `https://pmc-backend-q5dn.onrender.com`;
-  // private apiUrl = `http://localhost:8000`;
+  // private apiUrl = `https://pmc-backend-q5dn.onrender.com`;
+  private apiUrl = `http://localhost:8000`;
 
   constructor(private http: HttpClient) {}
 
@@ -72,9 +72,8 @@ export class PredictionService {
       catchError(this.handleError)
     );
   }
-  
-  
-  
+
+    
 
   /**
    * 🛠 Gestion des erreurs HTTP

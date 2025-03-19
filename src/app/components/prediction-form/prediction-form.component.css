@@ -88,8 +88,13 @@ span.mdc-tab__text-label, .mat-mdc-select-trigger  {
 
 .btn-primary, span, .form-control {
   border: none;
-  background-color: #505050;
-  color: white;
+  color: #000000;
+}
+
+.result {
+  border: none;
+  font-weight: 700;
+  color: #14a800;
 }
 
 .btn-danger {

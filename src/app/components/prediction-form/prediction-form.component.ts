@@ -16,18 +16,18 @@ import { PredictionService } from '../../services/prediction.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faSearch, faTrash, faSpinner, faDownload, faSun, faMoon } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faTrash, faSpinner, faDownload, faSun, faMoon, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { Chart, registerables } from 'chart.js';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { faChevronDown, faChevronUp} from '@fortawesome/free-solid-svg-icons';
 
-// graphiques Chart.js
+// ✅ Ajout de cette ligne
 Chart.register(...registerables);
 
 export interface PredictionData {
   [key: string]: any;
 }
+
 
 export interface Features {
   Cyclepds: number;
@@ -62,7 +62,6 @@ export interface Features {
   fqvpo: number;
 }
 
-
 @Component({
   selector: 'app-prediction-form',
   templateUrl: './prediction-form.component.html',
@@ -87,6 +86,9 @@ export interface Features {
     FontAwesomeModule
   ]
 })
+
+
+
 export class PredictionFormComponent implements OnInit, AfterViewInit {
   // Variables globales
   selectedModel: string = "ml"; // Par défaut, le modèle ML est sélectionné
@@ -183,8 +185,14 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    console.log("📌 Paginator & Sort initialisés");
+    
+    // ✅ Vérifier si les canvases existent bien après chargement
+    const ctx1 = document.getElementById('predictionChart');
+    const ctx2 = document.getElementById('predictionHistogram');
+    
+    console.log("📌 Vérification des canvases après chargement :", ctx1, ctx2);
   }
+  
 
   initForm() {
     const controls: { [key: string]: FormControl } = {};
@@ -251,27 +259,20 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
       return;
     }
   
-    // ✅ Génération de l'objet features correctement formaté
-    const featuresObject: { [key: string]: number } = Object.keys(this.formGroup.controls).reduce((acc, key) => {
-      acc[key] = this.formGroup.controls[key].value;
+    // 🛠️ Création d'un objet Features avec des valeurs strictement typées
+    const featuresObject = Object.keys(this.formGroup.controls).reduce((acc, key) => {
+      acc[key] = Number(this.formGroup.controls[key].value);  // ✅ Assure que toutes les valeurs sont des nombres
       return acc;
-    }, {} as { [key: string]: number });
-    
-    const inputData = {
-      model_type: this.selectedModelType?.trim().toLowerCase(),  // ✅ Assure que la valeur est bien une chaîne correcte
-      features: Object.keys(this.formGroup.value).reduce((acc, key) => {
-          acc[key] = Number(this.formGroup.value[key]);  // ✅ Conversion en nombre
-          return acc;
-      }, {} as { [key: string]: number })
-    };
-  
+    }, {} as { [key: string]: number });  // ✅ Correction ici
+   
     
   
-    console.log("📡 Données envoyées :", inputData); // Debugging avant envoi
-    
-
-    
     this.isLoading = true;
+    const inputData = {
+      model_type: this.selectedModel?.trim().toLowerCase(),
+      features: featuresObject  // ✅ Correction ici
+    };
+    
     this.predictionService.getPrediction(inputData).subscribe({
       next: (response) => {
         const newPrediction = { ...featuresObject, prediction: response.prediction };
@@ -286,65 +287,73 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
       }
     });
+    
   }
   
-  
 
   
 
-updateChart() {
-  const ctx1 = document.getElementById('predictionChart') as HTMLCanvasElement;
-  const ctx2 = document.getElementById('predictionHistogram') as HTMLCanvasElement;
+  updateChart() {
+    // Vérifier si les canvases existent
+    const ctx1 = document.getElementById('predictionChart') as HTMLCanvasElement;
+    const ctx2 = document.getElementById('predictionHistogram') as HTMLCanvasElement;
   
-  console.log("🎯 Vérification des canvases :", ctx1, ctx2);
-  if (!ctx1 || !ctx2) {
-    console.warn("⚠️ Les éléments canvas ne sont pas trouvés !");
-    return;
-  }
-
-  // Supprime les anciens graphiques s'ils existent
-  [ctx1, ctx2].forEach(ctx => {
-    const existingChart = Chart.getChart(ctx);
-    if (existingChart) {
-      // console.log("🔄 Suppression de l'ancien graphique sur :", ctx.id);
-      existingChart.destroy();
+    console.log("🎯 Vérification des canvases :", ctx1, ctx2);
+    if (!ctx1 || !ctx2) {
+      console.warn("⚠️ Les éléments canvas ne sont pas trouvés !");
+      return;
     }
-  });
-
-  const labels = this.historiquePredictions.map((_, index) => `Prédiction ${index + 1}`);
-  const dataValues = this.historiquePredictions.map(pred => pred['prediction']);
-
-  // Évolution des prédictions
-  new Chart(ctx1, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Évolution des Prédictions',
-        data: dataValues,
-        borderColor: 'rgba(0, 123, 255, 1)',
-        borderWidth: 2
-      }]
-    },
-    options: { responsive: true }
-  });
-
-  // Histogramme des prédictions
-  new Chart(ctx2, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Distribution des Prédictions',
-        data: dataValues,
-        backgroundColor: 'rgba(255, 99, 132, 0.6)'
-      }]
-    },
-    options: { responsive: true }
-  });
-
-  console.log("✅ Graphiques mis à jour !");
-}
+  
+    // Supprime les anciens graphiques s'ils existent
+    [ctx1, ctx2].forEach(ctx => {
+      const existingChart = Chart.getChart(ctx);
+      if (existingChart) {
+        existingChart.destroy();
+      }
+    });
+  
+    // 🛠️ Formater les prédictions avec 2 décimales
+    const labels = this.historiquePredictions.map((_, index) => `Prédiction ${index + 1}`);
+    const dataValues = this.historiquePredictions.map(pred => Number(pred['prediction']).toFixed(2));
+  
+    // 📈 Évolution des Prédictions
+    new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Évolution des Prédictions',
+          data: dataValues,
+          borderColor: 'rgba(0, 123, 255, 1)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  
+    // 📊 Histogramme des Prédictions
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Distribution des Prédictions',
+          data: dataValues,
+          backgroundColor: 'rgba(255, 99, 132, 0.6)'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  
+    console.log("✅ Graphiques mis à jour !");
+    this.cdr.detectChanges(); // 🔄 Forcer la mise à jour d'Angular
+  }
 
 
 
@@ -389,3 +398,4 @@ updateChart() {
     this.snackBar.open(message, 'OK', { duration: 3000, panelClass: isError ? 'error-snackbar' : 'success-snackbar' });
   }
 }
+
