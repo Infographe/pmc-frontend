@@ -275,18 +275,29 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
     
     this.predictionService.getPrediction(inputData).subscribe({
       next: (response) => {
-        const newPrediction = { ...featuresObject, prediction: response.prediction };
+        console.log("📡 Réponse de l'API :", response);
+        if (!response || response.prediction === undefined) {
+          console.error("❌ L'API ne retourne pas de prédiction valide !");
+          this.showNotification("Erreur : L'API ne retourne pas de prédiction.", true);
+          return;
+        }
+    
+        // ✅ Stockage et affichage de la prédiction
+        const newPrediction = { ...featuresObject, prediction: Number(response.prediction).toFixed(2) };
         this.historiquePredictions.unshift(newPrediction);
         this.dataSource.data = [...this.historiquePredictions];
+        this.prediction = response.prediction; // Mise à jour de la variable affichée
         this.isLoading = false;
         this.cdr.detectChanges();
         this.updateChart();
       },
       error: (error) => {
         console.error('❌ Erreur API :', error);
+        this.showNotification("Erreur API : " + error.message, true);
         this.isLoading = false;
       }
     });
+    
     
   }
   
