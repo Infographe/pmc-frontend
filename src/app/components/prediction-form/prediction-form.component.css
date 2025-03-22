@@ -14,6 +14,10 @@
   margin-top: 30vh !important;
 }
 
+
+#predictionHistogram, #predictionChart{
+  height: 300px;
+}
 /* 🌟 Style des cartes */
 .card {
   border-radius: 1.5rem;
@@ -64,6 +68,12 @@ button {
   align-items: center;
   justify-content: center;
 }
+
+.form-label{
+  padding: 10px 0;
+  color: #FFFFFF;
+}
+
 
 button:hover {
   transform: scale(1.05);

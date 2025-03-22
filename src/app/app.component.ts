@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';  // ✅ À conserver
+import { CommonModule } from '@angular/common';  // À conserver
 import { FormsModule, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { MatSliderModule } from '@angular/material/slider';
@@ -15,7 +15,7 @@ import { PredictionFormComponent } from './components/prediction-form/prediction
   selector: 'app-root',
   templateUrl: './app.component.html',
   imports: [
-    CommonModule,  // ✅ Remplace `BrowserModule`
+    CommonModule,  // Remplace `BrowserModule`
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
@@ -32,8 +32,8 @@ import { PredictionFormComponent } from './components/prediction-form/prediction
 })
 export class AppComponent {
   prediction: any;
-  selectedModelType: string = "ml";  // ✅ Par défaut, modèle ML sélectionné
-  formGroup!: FormGroup; // ✅ Déclare formGroup pour éviter l'erreur
+  selectedModelType: string = "ml";  // Par défaut, modèle ML sélectionné
+  formGroup!: FormGroup; // Déclare formGroup pour éviter l'erreur
 
   constructor(private predictionService: PredictionService) {}
 
@@ -72,11 +72,11 @@ export class AppComponent {
     };
     
 
-    console.log("📡 Envoi des données avec modèle :", this.selectedModelType);
-    console.log("🔍 Features envoyées :", data);
+    console.log("Envoi des données avec modèle :", this.selectedModelType);
+    console.log("Features envoyées :", data);
 
     const inputData = {
-      model_type: this.selectedModelType?.trim().toLowerCase(), // ✅ Correction
+      model_type: this.selectedModelType?.trim().toLowerCase(), // Correction
       features: Object.keys(this.formGroup.value).reduce((acc, key) => {
           acc[key] = Number(this.formGroup.value[key]);
           return acc;
@@ -87,10 +87,10 @@ export class AppComponent {
     
     this.predictionService.getPrediction(inputData).subscribe({
       next: (response) => {
-        console.log("📥 Réponse API :", response);
+        console.log("Réponse API :", response);
       },
       error: (error) => {
-        console.error("❌ Erreur API :", error);
+        console.error("Erreur API :", error);
       }
     });   
     

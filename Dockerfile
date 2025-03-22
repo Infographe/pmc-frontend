@@ -8,7 +8,7 @@ RUN npm run build --configuration=production
 
 # Étape 2 : Serveur Nginx
 FROM nginx:alpine AS runtime-stage
-# ✅ Assure-toi de copier les fichiers du bon dossier "browser" dans nginx
+# Copier les fichiers du bon dossier "browser" dans nginx
 COPY --from=build-stage /app/dist/frontend/browser /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
 

@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
 
-// ✅ Interface correspondant aux features attendues par l'API
+// Interface correspondant aux features attendues par l'API
 export interface Features {
   Cyclepds: number;
   region: number;
@@ -39,13 +39,13 @@ export interface Features {
 }
 
 
-// ✅ Interface du format de la requête envoyée à FastAPI
+// Interface du format de la requête envoyée à FastAPI
 export interface PredictionRequest {
   model_choice: string;  // "ml" ou "dl"
   features: Features;    // Un objet contenant les features
 }
 
-// ✅ Interface du format de la réponse attendue
+// Interface du format de la réponse attendue
 export interface PredictionResponse {
   prediction: number;
 }
@@ -59,16 +59,16 @@ export class PredictionService {
   constructor(private http: HttpClient) {}
 
   /**
-   * 🔥 Envoi des données pour obtenir une prédiction
+   * Envoi des données pour obtenir une prédiction
    * @param features Données des features sous forme d'objet
    * @param modelType Type de modèle à utiliser ("ml" ou "dl")
    * @returns Observable contenant la prédiction
    */
   getPrediction(data: { model_type: string; features: { [key: string]: number } }): Observable<any> {
-    console.log("📡 Envoi des données à l'API :", data); // Debug
+    console.log("Envoi des données à l'API :", data); // Debug
   
     return this.http.post<any>(`${this.apiUrl}/predict`, data).pipe(
-      tap(response => console.log("📥 Réponse de l'API :", response)), // Debug
+      tap(response => console.log("Réponse de l'API :", response)), // Debug
       catchError(this.handleError)
     );
   }
@@ -76,12 +76,12 @@ export class PredictionService {
     
 
   /**
-   * 🛠 Gestion des erreurs HTTP
+   * Gestion des erreurs HTTP
    * @param error Objet d'erreur retourné par l'API
    * @returns Observable qui lève une erreur formatée
    */
   private handleError(error: HttpErrorResponse) {
-    console.error("❌ Erreur API :", error);
+    console.error("Erreur API :", error);
 
     let errorMessage = "Erreur inconnue";
     if (error.error instanceof ErrorEvent) {

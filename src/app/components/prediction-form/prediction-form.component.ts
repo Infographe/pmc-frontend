@@ -21,7 +21,7 @@ import { Chart, registerables } from 'chart.js';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
-// ✅ Ajout de cette ligne
+// Ajout de cette ligne
 Chart.register(...registerables);
 
 export interface PredictionData {
@@ -97,9 +97,9 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [];
   dataSource = new MatTableDataSource<PredictionData>([]);
   isLoading = false;
-  filtersEnabled = false;
+  // filtersEnabled = false;
   predictionResult = [];
-  prediction: any;  // ✅ Déclare la variable pour stocker le résultat de l'API
+  prediction: any;  // Déclare la variable pour stocker le résultat de l'API
 
   // Définition manuelle des 30 features avec plages de validation
   allFeatures = [
@@ -138,7 +138,7 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
 
   formGroup!: FormGroup;
 
-  // themeSombre = false;
+
   // icônes
   faSearch = faSearch;
   faTrash = faTrash;
@@ -151,7 +151,6 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
 
   // inputs et filtres
   formData: PredictionData = {};
-  filterFeatures: { [key: string]: string } = {};
   inputsVisible: boolean = true;
   selectedTab: number = 0;
   
@@ -172,12 +171,11 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.displayedColumns = [...new Set(this.allFeatures.map(f => f.name)), 'prediction']; // Suppression des doublons
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.dataSource = new MatTableDataSource<PredictionData>(this.historiquePredictions); // Correction ici
     
-    console.log("🚀 Initialisation du composant");
+    console.log("Initialisation du composant");
     this.dataSource.data = this.historiquePredictions;
-    console.log("🔍 Contenu du tableau au démarrage :", this.dataSource.data);
+    console.log("Contenu du tableau au démarrage :", this.dataSource.data);
 
     this.initForm();
   }
@@ -186,11 +184,11 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     
-    // ✅ Vérifier si les canvases existent bien après chargement
+    // Vérifier si les canvases existent bien après chargement
     const ctx1 = document.getElementById('predictionChart');
     const ctx2 = document.getElementById('predictionHistogram');
     
-    console.log("📌 Vérification des canvases après chargement :", ctx1, ctx2);
+    console.log("Vérification des canvases après chargement :", ctx1, ctx2);
   }
   
 
@@ -211,11 +209,6 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
     setTimeout(() => this.cdr.detectChanges(), 0);
   }
 
-  toggleFilters() {
-    this.filtersEnabled = !this.filtersEnabled;
-    setTimeout(() => this.cdr.detectChanges(), 0);
-  }
-
   // Séparer les données ML et DL
   mlFeatures = [];
   dlFeatures = [];
@@ -227,7 +220,7 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
 
   onModelChange(model: string) {
     this.selectedModelType = model;
-    console.log(`🚀 Modèle changé : ${model}`);
+    console.log(`Modèle changé : ${model}`);
   }
 
 
@@ -247,46 +240,46 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
       this.formData[feature.name] = randomValue;
     });
     
-    console.log("🎲 Autofill généré :", this.formGroup.value);
+    console.log("Autofill généré :", this.formGroup.value);
 
     this.cdr.detectChanges();
   }
   
 
   envoyerDonnees() {
-    if (this.formGroup.invalid) {
-      this.showNotification('❌ Veuillez remplir tous les champs correctement.', true);
+    if (this.formGroup.invalid || !this.populationSize) {
+      this.showNotification('❌ Veuillez remplir tous les champs correctement, y compris la taille de la population exposée.', true);
       return;
     }
-  
-    // 🛠️ Création d'un objet Features avec des valeurs strictement typées
+
     const featuresObject = Object.keys(this.formGroup.controls).reduce((acc, key) => {
-      acc[key] = Number(this.formGroup.controls[key].value);  // ✅ Assure que toutes les valeurs sont des nombres
+      acc[key] = Number(this.formGroup.controls[key].value);
       return acc;
-    }, {} as { [key: string]: number });  // ✅ Correction ici
-   
-    
-  
+    }, {} as { [key: string]: number });
+
     this.isLoading = true;
     const inputData = {
       model_type: this.selectedModel?.trim().toLowerCase(),
-      features: featuresObject  // ✅ Correction ici
+      features: featuresObject
     };
-    
+
     this.predictionService.getPrediction(inputData).subscribe({
       next: (response) => {
-        console.log("📡 Réponse de l'API :", response);
+        console.log("📡 Réponse API :", response);
         if (!response || response.prediction === undefined) {
           console.error("❌ L'API ne retourne pas de prédiction valide !");
           this.showNotification("Erreur : L'API ne retourne pas de prédiction.", true);
           return;
         }
-    
-        // ✅ Stockage et affichage de la prédiction
-        const newPrediction = { ...featuresObject, prediction: Number(response.prediction).toFixed(2) };
-        this.historiquePredictions.unshift(newPrediction);
-        this.dataSource.data = [...this.historiquePredictions];
-        this.prediction = response.prediction; // Mise à jour de la variable affichée
+
+        this.prediction = Number(response.prediction); // ex: 9.56
+        this.historiquePredictions.unshift({
+          ...featuresObject,
+          prediction: this.prediction
+        });
+
+        this.dataSource.data = [...this.historiquePredictions]; // ✅ Rafraîchit bien le tableau
+        this.calculerEstimation();  // 🔥 Recalculer automatiquement l'affichage
         this.isLoading = false;
         this.cdr.detectChanges();
         this.updateChart();
@@ -297,10 +290,52 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
       }
     });
-    
-    
   }
   
+  
+  // Variable pour stocker la taille de la population exposée
+  populationSize: number | null = null;
+  estimationPopulation: number | null = null;
+
+  // Méthode pour calculer le nombre de personnes affectées
+  calculerPersonnesAffetees() {
+    if (!this.populationSize || this.populationSize <= 0 || this.historiquePredictions.length === 0) {
+      this.estimationPopulation = 0;
+      return;
+    }
+  
+    // Récupère la dernière prédiction et la convertit en taux
+    const dernierePrediction = this.historiquePredictions[0]['prediction'] / 100;
+  
+    // Taille de l’échantillon de formation (📌 À adapter selon ton dataset)
+    const tailleEchantillon = 1000;
+  
+    // Calcul proportionnel
+    this.estimationPopulation = Math.round((dernierePrediction / tailleEchantillon) * this.populationSize);
+  }
+
+  verifierPopulation() {
+    if (!this.populationSize || this.populationSize <= 0) {
+      this.showNotification("❌ Veuillez entrer une taille de population valide.", true);
+    }
+  }
+  
+
+  estimationAffectes: number = 0;
+  predictionPercentage: number = 0;  // Valeur en pourcentage
+
+  calculerEstimation() {
+    if (this.prediction !== null && this.populationSize !== null && this.populationSize > 0) {
+      // ❗ NE PAS multiplier prediction par 100
+      this.predictionPercentage = this.prediction;
+      this.estimationAffectes = Math.round(this.prediction / 100 * this.populationSize);
+    } else {
+      this.predictionPercentage = 0;
+      this.estimationAffectes = 0;
+    }
+  }
+  
+
 
   
 
@@ -323,11 +358,11 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
       }
     });
   
-    // 🛠️ Formater les prédictions avec 2 décimales
+    // Formater les prédictions avec 2 décimales
     const labels = this.historiquePredictions.map((_, index) => `Prédiction ${index + 1}`);
     const dataValues = this.historiquePredictions.map(pred => Number(pred['prediction']).toFixed(2));
   
-    // 📈 Évolution des Prédictions
+    // Évolution des Prédictions
     new Chart(ctx1, {
       type: 'line',
       data: {
@@ -345,7 +380,7 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
       }
     });
   
-    // 📊 Histogramme des Prédictions
+    // Histogramme des Prédictions
     new Chart(ctx2, {
       type: 'bar',
       data: {
@@ -362,20 +397,11 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
       }
     });
   
-    console.log("✅ Graphiques mis à jour !");
-    this.cdr.detectChanges(); // 🔄 Forcer la mise à jour d'Angular
+    console.log("Graphiques mis à jour !");
+    this.cdr.detectChanges(); // Forcer la mise à jour d'Angular
   }
 
-
-
-  applyFilter() {
-    this.dataSource.data = this.historiquePredictions.filter(entry =>
-      this.displayedColumns.every(col => 
-        !this.filterFeatures[col] || entry[col]?.toString().includes(this.filterFeatures[col])
-      )
-    );
-  }
-
+  
   exporterCSV() {
     const header = Object.keys(this.historiquePredictions[0]).join(",");
     const rows = this.historiquePredictions.map(row => Object.values(row).join(","));
