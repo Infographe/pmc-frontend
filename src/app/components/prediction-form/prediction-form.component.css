@@ -207,7 +207,7 @@ mat-paginator {
 }
 
 
-select{
+.form-select-alt{
   background-color: transparent;
   display: block;
   color: rgb(153, 153, 153);

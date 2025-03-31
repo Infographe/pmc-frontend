@@ -12,41 +12,35 @@
     </div>
 
     
-
-  
     <!-- Champ pour la taille de la population exposée (obligatoire) -->
     <div class="row mb-5">
       <div class="col-md-4">
         <div class="mb-3 pb-3">
-          <label for="populationSize" class="form-label">Taille de la population exposée :</label>
-          <input type="number" id="populationSize" class="form-control"
-                [(ngModel)]="populationSize" (input)="calculerEstimation()" required>
+          <label for="populationSize" class="form-label text-primary">Taille de la population exposée :</label>
+          <input type="number" id="populationSize" class="form-control" [(ngModel)]="populationSize" (input)="calculerEstimation()" required min="1">
         </div>
       </div>
 
-       <!-- Résultat de la prédiction (mis à jour automatiquement) -->
+      <!-- Résultat de la prédiction -->
       <div class="col-md-4">
         <div class="text-center mt-3" *ngIf="prediction !== null">
-          <h3 class="text-primary">Résultat de la prédiction :</h3>
-          <p class="h4 font-weight-bold text-success">
-            {{ predictionPercentage | number: '1.2-2' }} %
-          </p>
+          <h5 class="text-primary">Résultat de la prédiction :</h5>
+          <p class="h4 font-weight-bold text-success">{{ prediction | number: '1.2-2' }} %</p>
         </div>
       </div>
-      
-      <!-- Estimation des personnes affectées (calcul automatique) -->
+
+      <!-- Estimation des personnes affectées -->
       <div class="col-md-4">
         <div class="mt-3">
-          <h5>Estimation des personnes affectées :</h5>
-          <p class="h4 font-weight-bold text-danger">
-            {{ estimationAffectes | number: '1.0-0' }} personnes
-          </p>
+          <h5 class="text-primary">Estimation des personnes affectées :</h5>
+          <p class="h4 font-weight-bold text-danger">{{ estimationAffectes | number: '1.0-0' }} personnes</p>
         </div>
+      </div>
     </div>
 
 
+    <!-- Formulaire lié à formGroup -->
     <div class="card shadow p-4 fade show">
-      <!-- Formulaire lié à formGroup -->
       <form [formGroup]="formGroup">
         <mat-tab-group>
           <mat-tab label="Données Principales">
@@ -54,14 +48,45 @@
               <div class="row g-3">
                 <div class="col-md-4" *ngFor="let feature of featuresMain">
                   <label class="form-label">{{ feature.name | titlecase }}</label>
-                  <input type="number" class="form-control"
-                         [formControlName]="feature.name"
-                         [attr.name]="feature.name"
-                         [ngClass]="{'is-invalid': formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched}">
+                
+                  <!-- Cas particulier : menu déroulant pour region -->
+                  <ng-container *ngIf="feature.name === 'dept'; else normalSelect">
+                    <select class="form-select"
+                            [formControlName]="feature.name">
+                      <option *ngFor="let option of filteredDepartements" [ngValue]="option.value">
+                        {{ option.label }}
+                      </option>
+                    </select>
+                  </ng-container>
+                  
+                  <ng-template #normalSelect>
+                    <select class="form-select"
+                            [formControlName]="feature.name"
+                            *ngIf="feature.options"
+                            (change)="feature.name === 'region' ? onRegionChange($event) : null">
+                      <option *ngFor="let option of feature.options" [ngValue]="option.value">
+                        {{ option.label }}
+                      </option>
+                    </select>
+                  </ng-template>
+                  
+                
+                  <!-- Cas général : champ numérique classique -->
+                  <ng-container *ngIf="feature.name !== 'region' && feature.name !== 'dept'">
+                    <input type="number" class="form-control"
+                           [formControlName]="feature.name"
+                           [attr.name]="feature.name"
+                           [attr.min]="feature.min"
+                           [attr.max]="feature.max"
+                           [ngClass]="{'is-invalid': formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched}">
+                  </ng-container>
+                
+                  <!-- Message d'erreur -->
                   <div *ngIf="formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched" class="text-danger">
                     Valeur invalide (Min: {{feature.min}}, Max: {{feature.max}})
                   </div>
                 </div>
+                
               </div>
             </div>
           </mat-tab>
@@ -71,10 +96,7 @@
               <div class="row g-3">
                 <div class="col-md-4" *ngFor="let feature of featuresSecondary">
                   <label class="form-label">{{ feature.name | titlecase }}</label>
-                  <input type="number" class="form-control"
-                         [formControlName]="feature.name"
-                         [attr.name]="feature.name"
-                         [ngClass]="{'is-invalid': formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched}">
+                  <input type="number" class="form-control" [formControlName]="feature.name" [attr.name]="feature.name" [ngClass]="{'is-invalid': formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched}">
                   <div *ngIf="formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched" class="text-danger">
                     Valeur invalide (Min: {{feature.min}}, Max: {{feature.max}})
                   </div>
@@ -88,10 +110,7 @@
               <div class="row g-3">
                 <div class="col-md-4" *ngFor="let feature of featuresOthers">
                   <label class="form-label">{{ feature.name | titlecase }}</label>
-                  <input type="number" class="form-control"
-                         [formControlName]="feature.name"
-                         [attr.name]="feature.name"
-                         [ngClass]="{'is-invalid': formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched}">
+                  <input type="number" class="form-control" [formControlName]="feature.name" [attr.name]="feature.name" [ngClass]="{'is-invalid': formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched}">
                   <div *ngIf="formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched" class="text-danger">
                     Valeur invalide (Min: {{feature.min}}, Max: {{feature.max}})
                   </div>
@@ -104,13 +123,10 @@
 
       <!-- Boutons d'action -->
       <div class="col-12 text-center mt-3">
-        <button class="btn mt-3" (click)="envoyerDonnees()" 
-        [disabled]="isLoading || formGroup.invalid || !populationSize || populationSize <= 0">
+        <button class="btn mt-3" (click)="envoyerDonnees()" [disabled]="isLoading || formGroup.invalid || !populationSize || populationSize <= 0">
           Prédire
-          <fa-icon *ngIf="isLoading" [icon]="faSpinner" spin></fa-icon> 
+          <fa-icon *ngIf="isLoading" [icon]="faSpinner" spin></fa-icon>
         </button>
-
-
         <button class="btn mt-3" (click)="effacerHistorique()">Effacer l'historique</button>
         <button class="btn mt-3" (click)="autoFill()">Auto Remplissage</button>
       </div>
@@ -177,10 +193,10 @@
 
     <!-- Boutons d'export -->
     <div class="d-flex flex-column ml-5 mt-3 exports">
-      <select class="form-select" [(ngModel)]="selectedModel">
+      <!-- <select class="form-select-alt" [(ngModel)]="selectedModel">
         <option value="ml">Machine Learning</option>
         <option value="dl">Deep Learning</option>
-      </select>      
+      </select>       -->
 
       <button class="btn btn-success" (click)="exporterCSV()">Exporter en CSV</button>
       <button class="btn btn-info" (click)="exporterExcel()">Exporter en Excel</button>
