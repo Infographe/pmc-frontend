@@ -234,8 +234,8 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
         // { label: '976 - Mayotte', value: 976 }
       ]
     },
-    { name: 'annee', min: 50, max: 250 },
-    { name: 'mois', min: 100, max: 300 },
+    { name: 'annee', min: 2000, max: 2025 },
+    { name: 'mois', min: 1, max: 12 },
     { name: 'pm10', min: 2, max: 250 },
     { name: 'carbon_monoxide', min: 4, max: 12 },
     { name: 'poids_moyen', min: 0, max: 1 },
@@ -359,6 +359,13 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
     return (deptFeature?.options || []) as { label: string; value: number; regionCode: number }[];
   }
   
+  // Aide
+  showAide = false;
+
+  toggleAide() {
+    this.showAide = !this.showAide;
+  }
+
 
   // getFeatureValues() {
   //   return this.selectedModelType === "ml" ? this.mlFeatures : this.dlFeatures;
@@ -377,17 +384,19 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
     return deptFeature?.options?.filter((d: any) => d.regionCode === Number(regionCode)) || [];
   }
   
-  onRegionChange(event: Event) {
-    const selectedValue = Number((event.target as HTMLSelectElement).value);
-    this.filteredDepartements = this.departements.filter(dep => dep.regionCode === selectedValue);
+  onRegionChange(selectedRegionCode: number) {
+    const allDeptOptions = this.allFeatures.find(f => f.name === 'dept')?.options || [];
+    this.filteredDepartements = allDeptOptions.filter(dep => dep.regionCode === selectedRegionCode);
   
+    // Réinitialiser le département si sa valeur ne correspond plus à la région
     const currentDept = this.formGroup.get('dept')?.value;
-    const valid = this.filteredDepartements.some(dep => dep.value === currentDept);
+    const isDeptValide = this.filteredDepartements.some(dep => dep.value === currentDept);
   
-    if (!valid) {
-      this.formGroup.get('dept')?.setValue(null); // reset
+    if (!isDeptValide) {
+      this.formGroup.get('dept')?.setValue(null);
     }
   }
+  
   
   
   

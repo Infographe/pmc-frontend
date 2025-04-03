@@ -16,7 +16,7 @@
     <div class="row mb-5">
       <div class="col-md-4">
         <div class="mb-3 pb-3">
-          <label for="populationSize" class="form-label text-primary">Taille de la population exposée :</label>
+          <h5 for="populationSize" class="form-label text-primary mt-1">Taille de la population exposée :</h5>
           <input type="number" id="populationSize" class="form-control" [(ngModel)]="populationSize" (input)="calculerEstimation()" required min="1">
         </div>
       </div>
@@ -32,7 +32,7 @@
       <!-- Estimation des personnes affectées -->
       <div class="col-md-4">
         <div class="mt-3">
-          <h5 class="text-primary">Estimation des personnes affectées :</h5>
+          <h5 class="text-primary">Estimation personnes affectées :</h5>
           <p class="h4 font-weight-bold text-danger">{{ estimationAffectes | number: '1.0-0' }} personnes</p>
         </div>
       </div>
@@ -52,18 +52,20 @@
                   <!-- Cas particulier : menu déroulant pour region -->
                   <ng-container *ngIf="feature.name === 'dept'; else normalSelect">
                     <select class="form-select"
-                            [formControlName]="feature.name">
+                            [formControlName]="feature.name"
+                            [ngClass]="{'is-invalid': formGroup.controls[feature.name].invalid && formGroup.controls[feature.name].touched}">
                       <option *ngFor="let option of filteredDepartements" [ngValue]="option.value">
                         {{ option.label }}
                       </option>
                     </select>
                   </ng-container>
                   
+                  
                   <ng-template #normalSelect>
                     <select class="form-select"
                             [formControlName]="feature.name"
                             *ngIf="feature.options"
-                            (change)="feature.name === 'region' ? onRegionChange($event) : null">
+                            (change)="onRegionChange(formGroup.get('region')?.value)">
                       <option *ngFor="let option of feature.options" [ngValue]="option.value">
                         {{ option.label }}
                       </option>
@@ -200,22 +202,23 @@
 
       <button class="btn btn-success" (click)="exporterCSV()">Exporter en CSV</button>
       <button class="btn btn-info" (click)="exporterExcel()">Exporter en Excel</button>
+      <!-- Aides -->
+      <button class="btn btn-link aide-toggle" (click)="toggleAide()">
+        <fa-icon [icon]="showAide ? faChevronUp : faChevronDown"></fa-icon> &nbsp;
+        {{ showAide ? 'Masquer l\'aide' : 'Aide' }}
+      </button>
+
+      <div class="aide-panel" [class.active]="showAide">
+        <h5>Descriptif des champs :</h5>
+        <ul>
+          <li><strong>Cyclepds</strong> → Nombre de cycles de soins</li>
+          <li><strong>Region</strong> → Région administrative</li>
+          <li><strong>Dept</strong> → Département</li>
+          <li><strong>Année</strong> 2015 <- -> 2025</li>
+          <!-- Ajoute ici tous les autres champs avec une courte description -->
+        </ul>
+      </div>
      
     </div>
   </div>
 
-  
-
-
-
-
-
-
-
-
-
-
-  
-  
-
-</div>

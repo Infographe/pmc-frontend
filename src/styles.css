@@ -8,6 +8,11 @@ body {
     color: #FFFFFF;
 }
 
-.mat-mdc-slide-toggle .mat-internal-form-field {
+.mat-mdc-slide-toggle .mat-internal-form-field, 
+.mat-mdc-tab .mdc-tab__text-label,
+.mat-mdc-select,
+.mat-mdc-paginator-icon
+{
     color: #FFFFFF!important;
+    fill: #FFFFFF!important;
 }
