@@ -263,7 +263,37 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
     { name: 'fqvpo', min: 1, max: 9 }
   ];
 
-
+  featureTooltip: { [key: string]: string } = {
+    annee: 'Année (2020 → 2025)',
+    mois: 'Mois (1 → 12)',
+    carbon_monoxide: 'Carbone monoxide (134 → 273)',
+    poids_moyen: 'Poids moyen (25 → 100)',
+    p_animal: 'Présence animale (1 → 20)',
+    agglo9: 'Agglomération (1 → 9)',
+    entrerep: 'Entreprises répertoriées (1 → 9)',
+    fastfood: 'Fastfood proximité (1 → 9)',
+    ozone: 'Ozone (25 → 70)',
+    dip: 'Diplôme (1 → 14)',
+    sulphur_dioxide: 'Sulphur dioxide (0.75 → 3.3)',
+    temps_act_phy: 'Temps activité physique (1 → 2000)',
+    sedentaire: 'Temps sédentaire (1 → 690)',
+    sexeps: 'Sexe (1 → 2)',
+    vistes_medecins: 'Visites médecins (0 → 100)',
+    pm2_5: 'Particules fines PM2.5 (7 → 21)',
+    taille: 'Taille en cm (100 → 195)',
+    IMC: 'Indice de masse corporelle (10 → 56)',
+    situ_prof: 'Situation professionnelle (1 → 7)',
+    grass_pollen: 'Pollen d\'herbe (0 → 29)',
+    enrich: 'Enrichissement données (1 → 5)',
+    heur_trav: 'Heures de travail (0 → 99)',
+    situ_mat: 'Situation matrimoniale (1 → 6)',
+    nitrogen_dioxide: 'Dioxyde d\'azote (11 → 30)',
+    fqvpo: 'Fréquence Visites Points Observation (1 → 9)',
+    Cyclepds: 'Cycle périodique (1 → 120)',
+    region: 'Région administrative',
+    dept: 'Département administratif'
+  };
+  
   formGroup!: FormGroup;
   // Liste complète des départements (à extraire de `allFeatures`)
   departements: { label: string; value: number; regionCode: number }[] = this.allFeatures.find(f => f.name === 'dept')?.options || [];
