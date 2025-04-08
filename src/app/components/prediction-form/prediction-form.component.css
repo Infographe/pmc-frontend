@@ -91,9 +91,9 @@ span.mdc-tab__text-label, .mat-mdc-select-trigger  {
 }
 
 .exports {
-  position: absolute;
+  position: fixed;
   top: 0;
-  left: 0;
+  right: 0;
 }
 
 .btn-primary, span, .form-control {
@@ -236,8 +236,8 @@ mat-paginator {
 .aide-toggle {
   position: fixed;
   text-decoration: none;
-  top: 11vh;
-  /* left: 10px; */
+  top: 10vh;
+  left: 10px;
   z-index: 1050;
   color: rgb(153, 153, 153);
   /* font-weight: bold; */
@@ -245,7 +245,7 @@ mat-paginator {
 
 .aide-panel {
   position: fixed;
-  top: 15vh;
+  top: 16vh;
   left: 15px;
   width: 22vw;
   max-height: 80vh;
@@ -302,3 +302,12 @@ strong {
   visibility: visible;
   opacity: 1;
 }
+
+.logos{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: auto;
+}
+

@@ -397,18 +397,6 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
   }
 
 
-  // getFeatureValues() {
-  //   return this.selectedModelType === "ml" ? this.mlFeatures : this.dlFeatures;
-  // }
-
-  // onModelChange(model: string) {
-  //   this.selectedModelType = model;
-  //   console.log(`Modèle changé : ${model}`);
-  // }
-
-  // Ce tableau contiendra dynamiquement les départements filtrés selon la région choisie
-  // departements: { label: string, value: number, regionCode: number }[] = [];
-
   getDepartementsForRegion(regionCode: number) {
     const deptFeature = this.allFeatures.find(f => f.name === 'dept');
     return deptFeature?.options?.filter((d: any) => d.regionCode === Number(regionCode)) || [];
@@ -461,7 +449,7 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
   // Ajout des champs à chaque prédiction
   envoyerDonnees() {
     if (this.formGroup.invalid || this.populationSize === null) {
-      this.showNotification('❌ Veuillez remplir tous les champs correctement, y compris la taille de la population exposée.', true);
+      this.showNotification('Veuillez remplir tous les champs correctement, y compris la taille de la population exposée.', true);
       return;
     }
 
@@ -531,7 +519,7 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
 
   verifierPopulation() {
     if (!this.populationSize || this.populationSize <= 0) {
-      this.showNotification("❌ Veuillez entrer une taille de population valide.", true);
+      this.showNotification("Veuillez entrer une taille de population valide.", true);
     }
   }
   
@@ -541,7 +529,7 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
 
   calculerEstimation() {
     if (this.prediction !== null && this.populationSize !== null && this.populationSize > 0) {
-      // ❗ NE PAS multiplier prediction par 100
+      // NE PAS multiplier prediction par 100
       this.predictionPercentage = this.prediction;
       this.estimationAffectes = Math.round(this.prediction / 100 * this.populationSize);
     } else {
@@ -561,7 +549,7 @@ export class PredictionFormComponent implements OnInit, AfterViewInit {
   
     console.log("🎯 Vérification des canvases :", ctx1, ctx2);
     if (!ctx1 || !ctx2) {
-      console.warn("⚠️ Les éléments canvas ne sont pas trouvés !");
+      console.warn("Les éléments canvas ne sont pas trouvés !");
       return;
     }
   

@@ -194,14 +194,23 @@
     </div>
 
     <!-- Boutons d'export -->
-    <div class="d-flex flex-column ml-5 mt-3 exports">
+     <div class="exports">
+      <button class="btn btn-success" (click)="exporterCSV()">Exporter en CSV</button>
+      <button class="btn btn-info" (click)="exporterExcel()">Exporter en Excel</button>
+     </div>
+    
+
+    <!-- Bouton d'aide -->
+    <div class="d-flex flex-column ml-5 mt-3 ">
       <!-- <select class="form-select-alt" [(ngModel)]="selectedModel">
         <option value="ml">Machine Learning</option>
         <option value="dl">Deep Learning</option>
       </select>       -->
-
-      <button class="btn btn-success" (click)="exporterCSV()">Exporter en CSV</button>
-      <button class="btn btn-info" (click)="exporterExcel()">Exporter en Excel</button>
+      
+      <div class="d-flex justify-content-around mt-3 logos mr-auto p-2">
+       <div><a href="https://www.m2iformation.fr/" target="_blank"><img src="../../../assets/img/m2i_logo.jpeg" width="50" height="50" alt=""></a></div>
+       <div><a href="https://www.jedha.co/" target="_blank" rel="noopener noreferrer"><img src="../../../assets/img/Jedha-logo.jpg" width="50" height="50" alt=""></a></div>
+      </div>
       <!-- Aides -->
       <button class="btn btn-link aide-toggle" (click)="toggleAide()">
         <fa-icon [icon]="showAide ? faChevronUp : faChevronDown"></fa-icon> &nbsp;
@@ -214,7 +223,7 @@
           <li><strong>Année</strong><em> 2020 → 2025</em></li>
           <li><strong>Mois</strong><em>  1 → 12</em></li>
           <li><strong>Carbone_monoxide</strong><em>134 → 273</em></li>
-          <li><strong>Poids_moyen</strong><em> 25 → 100 kg</em></li>
+          <li><strong>Poids_moyen</strong><em> 25 → 50 kg</em></li>
           <li><strong>P_animal</strong><em> 1 → 20</em></li>
           <li><strong>Agglo9</strong><em> 1 → 9</em></li>
           <li><strong>Entrerep</strong><em> 1 → 9</em></li>
@@ -242,3 +251,5 @@
     </div>
   </div>
 
+<!-- ************************************************************************************************ -->
+ 
